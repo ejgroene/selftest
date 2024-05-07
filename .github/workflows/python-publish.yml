@@ -12,6 +12,9 @@ on:
   push:
     tags: 
       - v*
+  workflow_dispatch:
+    tags: 
+      - v*
 
 permissions:
   contents: read
