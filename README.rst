@@ -22,7 +22,7 @@ Selftest is a simple and extensible test tool for Python. Selftest was first kno
 
 The benefit of this approach are:
 
-- there is no seprate test tree to maintain,
+- there is no separate test tree to maintain,
 - dependencies are automatically tested,
 - quicker cycles, more focus.
 
@@ -30,9 +30,9 @@ The core is extremely small and support for `async`, `filters`, `operators`, `fi
 
 In-source testing
 -----------------
-Selttest runs tests within your source code along side the implementation, similar to Rust's module tests and Vitest in-source testing.
+Selttest runs tests within the source code alongside the implementation, similar to Rust's module tests and Vitest in-source testing.
 
-This makes the tests share the same closure as the implementations and able to test against private states without exporting. Meanwhile, it also brings a closer feedback loop for development.
+This makes the tests share closure with the implementation and enables it to test against private state without exporting. Meanwhile, it also brings a closer feedback loop for development.
 
 
 History
@@ -54,13 +54,11 @@ Selftest began, as a recalcitrant move away from the frameworks, with the follow
 
 It would just run the test every time I imported it. That turned out to work so well that it grew out to what we have here today.
 
-Selftest was first named Autotest, due to conflicting names in the Python Package Index it was renamed to Selftest.
-
 
 Features
 --------
 
-Meanwhile autotest gained some features. It
+Meanwhile selftest gained some features. It
 
 #) works in a familiar *Pythonic* way, no magic,
 #) has one simple *API* via the test object,
@@ -78,7 +76,7 @@ Meanwhile autotest gained some features. It
 #) there is a *root* tester which can have *subtesters*,
 #) output is send to a *logger*.
 
-Although autotest promotes an agile, rigorous and Pythonic way of testing, since there is little magic and tests are just functions, you are free to organise them as you wish. You can even do it the Python unittest way, if you want.
+Although selftest promotes an agile, rigorous and Pythonic way of testing, since there is little magic and tests are just functions, you are free to organise them as you wish. You can even do it the Python unittest way, if you want.
 
 
 
@@ -89,8 +87,8 @@ Selftest has a global root tester that can have an arbitrarily deep and wide tre
 
 .. code:: python
 
-    import autotest
-    test = autotest.get_tester(__name__)
+    import selftest
+    test = selftest.get_tester(__name__)
 
     def area(w, h):
         return w * h
@@ -100,9 +98,9 @@ Selftest has a global root tester that can have an arbitrarily deep and wide tre
         assert 9 == area(3, 3)
         assert 6 == area(2, 3)
 
-Its creates a subtester using ``get_tester()``. The resulting tester object is the main access point to all functionality of autotest.  In this case, it is used as a decorator to mark and execute a test function.
+Its creates a subtester using ``get_tester()``. The resulting tester object is the main access point to all functionality of selftest.  In this case, it is used as a decorator to mark and execute a test function.
 
-More on assert later.
+More on ``assert`` later.
 
 
 
@@ -145,7 +143,7 @@ The API falls apart into five categories:
 Module Level API
 ----------------
 
-The autotest core consist of two module level functions:
+The selftest core consist of two module level functions:
 
 
 ``basic_config(**options)``
@@ -159,7 +157,7 @@ When name is ``None`` returns the root tester. Otherwise it returns a named chil
 
 Testers created this way become globally available. A call to ``get_tester()`` with the same name repeatedly will return the same tester.
 
-Recommended is to use ``test = get_tester(__name__)`` at the start of your module. Using subtesters is a powerful way of organising tests. See the source code of autotest for many examples.
+Recommended is to use ``test = get_tester(__name__)`` at the start of your module. Using subtesters is a powerful way of organising tests. See the source code of selftest for many examples.
 
 
 Tester Objects API
@@ -221,7 +219,7 @@ This creates a child and returns a context manager.
 
 .. code:: python
 
-   test = autotest.get_tester(__name__)
+   test = selftest.get_tester(__name__)
    with test.child(level=CRITICAL) as crit:
        @crit
        def a_critical_test_function():
@@ -260,7 +258,7 @@ hooks       list     []        List of hooks that are invoked in order.
 subprocess  boolean  False     Runs test when inside a subprocess.
 ==========  =======  =======   ==========================================================
 
-Normally, autotest runs a test as soon as it discovers it and then discards it. The example below show how tests can be run later by keeping and invoking them.
+Normally, selftest runs a test as soon as it discovers it and then discards it. The example below show how tests can be run later by keeping and invoking them.
 
 .. code:: python
 
@@ -380,14 +378,14 @@ Hook ``operator.py`` introduces the possibility to use various builtin operators
 
 When the given operator returns ``False`` according to ``bool()`` it raises ``AssertionError`` with the actual values of the arguments.
 
-This shows how autotest stays close to Python as we know it. It does nothing more than looking up the given attribute in four places:
+This shows how selftest stays close to Python as we know it. It does nothing more than looking up the given attribute in four places:
 
 #) module ``operator``, e.g.: ``test.gt(2, 1)``,
 #) module ``builtins``, e.g.: ``test.isinstance('aa', str)``,
 #) module ``inspect``, e.g.: ``test.isfunction(len)``,
 #) the first argument, e.g.: ``test.isupper("ABC")``.
 
-The benefits of this is that we do not have to learn new methods, that the assert functions are not limited, and that autotest can print the arguments for us on failure.
+The benefits of this is that we do not have to learn new methods, that the assert functions are not limited, and that selftest can print the arguments for us on failure.
 
 **diff**
 
@@ -619,12 +617,12 @@ Running tests during development can be done by just running or importing your m
 When you only want to develop a submodule, just ``cd`` down into that directory and do the same. Only the tests of that submodule (and everything in imports) will be tested.
 
 
-The methode above just prints crude messages and has no way to use options. For that use the main that comes with autotest:
+The methode above just prints crude messages and has no way to use options. For that use the main that comes with selftest:
 
 .. code:: bash
 
-  $ autotest --help
-  Usage: autotest [options] module
+  $ selftest --help
+  Usage: selftest [options] module
 
   Options:
     -h, --help            show this help message and exit
@@ -638,17 +636,17 @@ For example to run your tests but not the imported ones from other packages:
 
 .. code:: bash
 
-  $ autotest --filter mymodule mymodule
+  $ selftest --filter mymodule mymodule
 
 
-If you want to run the tests for autotests itself, go to the autotest project directory and use:
+If you want to run the tests for selftest itself, go to the selftest project directory and use:
 
 .. code:: bash
 
-  $ python -c "import autotest"  autotest.selftest
+  $ python -c "import selftest"  selftest.selftest
 
-The argument ``autotest.selftest`` lets autotest run its own tests, which are normally skipped.
-Also, this avoids using the autotest main program because it is not guaranteed that an installed old version of autotest can run its own test from the future.
+The argument ``selftest.selftest`` lets selftest run its own tests, which are normally skipped.
+Also, this avoids using the selftest main program because it is not guaranteed that an installed old version of selftest can run its own test from the future.
 
 
 **Production**

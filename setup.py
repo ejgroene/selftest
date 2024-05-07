@@ -29,12 +29,12 @@ here = pathlib.Path(__file__).parent.resolve()
 
 long_description = (here / "README.rst").read_text(encoding="utf-8")
 
-version = "0.4.0"
+version = "0.4.1"
 
 setup(
     name="selftest",
     version=version,
-    description="Python Testing Library",
+    description="Python In-Source Testing Library",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     packages=find_packages(),
@@ -42,7 +42,7 @@ setup(
     author_email="erik@seecr.nl",
     maintainer="Thijs Janssen",
     maintainer_email="thijs@seecr.nl",
-    url="https://github.com/seecr/selftest",
+    url="https://github.com/ejgroene/selftest",
     scripts=["bin/selftest"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
