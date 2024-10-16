@@ -239,7 +239,7 @@ testers = {}  # initial, for more testing
 def basic_config(**options):
     # raise Exception
     CR = '\n'
-    assert None not in testers, f"Root Tester {testers[None]}{CR} already created."
+    assert None not in testers, f"Root {testers[None]}{CR} already created."
     testers[None] = assemble_root_runner(**options)
 
 
