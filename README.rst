@@ -436,6 +436,8 @@ There are standard fixtures for:
 #) test - gives access to the current tester, useful for anonymous subtesters,
 #) stdout - captures ``sys.stdout``, including that of subprocesses, in a ``StringIO``,
 #) stderr - captures ``sys.stderr``, including that of subprocesses, in a ``StringIO``,
+#) stdin - replaces ``sys.stdin`` temporarily with a ``StringIO``. Make sure to ``seek(0)`` after writing.
+#) argv - saves ``sys.argv`` and restores it afterwards.
 #) tmp_path:subpath - creates a temporary ``pathlib.Path`` object, optionally with a subpath,
 #) raises:(Exception, message) - raises AssertionError if given code does not raise given exception with given message,
 #) guard - isolates tests by saving and restoring sys.path, sys.meta_path, and sys.modules.
