@@ -36,6 +36,8 @@
 
 """
 
+import itertools # iterate over stack
+import traceback # capture creation of Tester objects
 import inspect  # for recognizing functions, generators etc
 import contextlib  # child as context
 import collections  # chain maps for hierarchical Tester and Counter
@@ -96,6 +98,9 @@ class Tester:
 
     def __init__(self, name=None, parent=None, **options):
         """Not to be instantiated directly, use selftest.getTester() instead"""
+        fullstack = traceback.extract_stack().format()
+        stack = (f for f in fullstack if '/selftest/' not in f and '_bootstrap' not in f)
+        self._stack = ''.join(stack)
         self._parent = parent
         if parent:
             self._name = (
@@ -191,7 +196,8 @@ class Tester:
                 pass
 
     def __str__(self):
-        return f"<Tester {self._name!r}>"
+        CR = '\n'
+        return f"<Tester {self._name!r} created at:{CR}{self._stack}>"
 
 
 from numbers import Number
@@ -225,7 +231,10 @@ else:
         def lookup(self, runner, name):
             return self
 
-    self_test = Tester(hooks=[Ignore()])
+    def get_tester():
+        """ marker function """
+        return Tester(hooks=[Ignore()])
+    self_test = get_tester()
     # self_test.addHandler(logging.NullHandler())
 
 

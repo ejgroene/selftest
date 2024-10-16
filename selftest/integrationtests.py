@@ -63,7 +63,8 @@ def integration_test(test):
     def import_submodule(stdout, stderr):
         from selftest.tests.sub_module_ok import marker
 
-        test.eq("TESTER: <Tester 'selftest.tests.sub_module_ok'>\n", stdout.getvalue())
+        test.eq("TESTER: <Tester 'selftest.tests.sub_module_ok' created at:\n"
+                '  File "<string>", line 1, in <module>\n>\n', stdout.getvalue())
         test.eq("UNIT:selftest.tests.sub_module_ok.test_one\n", stderr.getvalue())
 
     try:

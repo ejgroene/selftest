@@ -29,6 +29,7 @@ import contextlib  # exit stacks
 import asyncio  # support for async test and fixtures
 import sys  # fiddling with stdout/err
 import os  # fiddling with stdout/err file descriptors
+import io  # StringIO for testing
 
 
 from .utils import asyncio_filtering_exception_handler, ensure_async_generator_func
@@ -240,11 +241,26 @@ def guard():
     ), f"sys.modules contaminated: {keep_modules.keys() ^ sys.modules.keys()}"
 
 
-std_fixtures = {fx.__name__: fx for fx in [tmp_path, stdout, stderr, raises, guard]}
+def argv():
+    orgv = sys.argv[:]
+    del sys.argv[1:]
+    yield sys.argv
+    sys.argv = orgv
+
+
+def stdin():
+    try:
+        sys.stdin = io.StringIO()
+        yield sys.stdin
+    finally:
+        sys.stdin = sys.__stdin__
+
+
+std_fixtures = {fx.__name__: fx for fx in [tmp_path, stdout, stderr, stdin, raises, guard, argv]}
 
 
 def capture_stdout_child_processes_spawn_f():
-    from autotest import get_tester
+    from selftest import get_tester
     self_test = get_tester(__name__)
 
     @self_test(subprocess=True)
@@ -367,6 +383,22 @@ def fixtures_test(self_test):
         p.join(1)
         s = stdout.getvalue()
         assert "hier ben ik\n" in s, s
+
+    @self_test
+    def argv_fixture():
+        org_arvg = sys.argv[:]
+        with self_test.argv as a:
+            a += ['new_arg']
+            self_test.eq('new_arg', sys.argv[-1])
+            self_test.eq(org_arvg + ['new_arg'], sys.argv)
+        self_test.eq(org_arvg, sys.argv)
+
+    @self_test
+    def stdin_fixture():
+        with self_test.stdin as i:
+            i.write('abc\n')
+            i.seek(0)
+            self_test.eq('abc', input())
 
     @self_test
     def test_fixtures():
@@ -658,3 +690,4 @@ def fixtures_test(self_test):
             self_test.eq(f"sys.modules contaminated: {{'this_is_a_module'}}", e.args[0])
         p = sys.modules.pop("this_is_a_module")
         assert p == "not a module"
+

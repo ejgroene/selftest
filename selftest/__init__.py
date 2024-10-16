@@ -91,7 +91,7 @@ diff_test(self_test)
 
 @self_test
 def check_stats():
-    self_test.eq({"found": 155, "run": 129}, self_test.stats)
+    self_test.eq({"found": 157, "run": 131}, self_test.stats)
 
 
 def assemble_root_runner(**options):
@@ -238,7 +238,8 @@ testers = {}  # initial, for more testing
 
 def basic_config(**options):
     # raise Exception
-    assert None not in testers, testers
+    CR = '\n'
+    assert None not in testers, f"Root Tester {testers[None]}{CR} already created."
     testers[None] = assemble_root_runner(**options)
 
 
