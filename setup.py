@@ -29,11 +29,8 @@ here = pathlib.Path(__file__).parent.resolve()
 
 long_description = (here / "README.rst").read_text(encoding="utf-8")
 
-version = "0.4.2"
-
 setup(
     name="selftest",
-    version=version,
     description="Python In-Source Testing Library",
     long_description=long_description,
     long_description_content_type="text/x-rst",
@@ -52,4 +49,6 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     python_requires=">=3.9",
+    setuptools_git_versioning={ "enabled": True },
+    setup_requires=["setuptools-git-versioning>=2.0,<3"]
 )
