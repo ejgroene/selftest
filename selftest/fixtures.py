@@ -51,7 +51,11 @@ def get_fixture(runner, name):
     """ find fixture in hierarchical maps """
     for map in runner.option_enumerate("fixtures"):
         if name in map:
-            return map[name]
+            f = map[name]
+            sig = inspect.signature(f)
+            if str(sig) == '(tester)':
+                f = f(runner)
+            return f
 
 
 def add_fixture(runner, func):
@@ -207,22 +211,31 @@ def stderr():
     yield from _capture("stderr")
 
 
-def raises(exception=Exception, message=None):
-    try:
-        yield
-    except exception as e:
-        if message and message != str(e):
+class Defer:
+    def set_exception(self, e):
+        self.exception = e
+
+
+def raises(tester):
+    def raises(exception=Exception, message=None):
+        defer = Defer()
+        try:
+            yield defer
+        except exception as e:
+            if message and message != str(e):
+                raise AssertionError(
+                    f"should raise {exception.__name__} with message '{message}'"
+                ) from e
+            defer.set_exception(e)
+        except BaseException as e:
             raise AssertionError(
-                f"should raise {exception.__name__} with message '{message}'"
-            ) from e
-    except BaseException as e:
-        raise AssertionError(
-            f"should raise {exception.__name__} but raised {type(e).__name__}"
-        ).with_traceback(e.__traceback__) from e
-    else:
-        e = AssertionError(f"should raise {exception.__name__}")
-        e.__suppress_context__ = True
-        raise e
+                f"should raise {exception.__name__} but raised {type(e).__name__}"
+            ).with_traceback(e.__traceback__) from e
+        else:
+            e = AssertionError(f"should raise {exception.__name__}")
+            e.__suppress_context__ = True
+            raise e
+    return raises
 
 
 def guard():
@@ -648,6 +661,23 @@ def fixtures_test(self_test):
                 raise RuntimeError("hey man!")
         except AssertionError as e:
             assert "should raise RuntimeError with message 'hey woman!'" == str(e)
+
+    @self_test
+    def assert_raises_special_asserts():
+        try:
+            class MyError(Exception):
+                pass
+            with self_test.raises(SyntaxError) as e:
+                raise SyntaxError('a msg', ('a name', 2, 3, "some text"))
+            self_test.eq('a name', e.exception.filename)
+            self_test.eq(2, e.exception.lineno)
+            self_test.eq(3, e.exception.offset)
+            self_test.eq("some text", e.exception.text)
+        except AssertionError as e:
+            self_test.eq('?', e)
+        except Exception as e:
+            self_test.fail(e)
+
 
     @self_test
     def assert_raises_as_fixture(raises: KeyError):

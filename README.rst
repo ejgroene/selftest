@@ -439,10 +439,10 @@ There are standard fixtures for:
 #) stdin - replaces ``sys.stdin`` temporarily with a ``StringIO``. Make sure to ``seek(0)`` after writing.
 #) argv - saves ``sys.argv`` and restores it afterwards.
 #) tmp_path:subpath - creates a temporary ``pathlib.Path`` object, optionally with a subpath,
-#) raises:(Exception, message) - raises AssertionError if given code does not raise given exception with given message,
+#) raises:(Exception, message) - raises AssertionError if given code does not raise given exception with given message; sends an object ``as`` target from which the exception can be retieved for further testing. See example.
 #) guard - isolates tests by saving and restoring sys.path, sys.meta_path, and sys.modules.
 
-An example for using ``raises()`` in two different ways:
+An example for using ``raises()`` in different ways:
 
 .. code:: python
 
@@ -452,6 +452,11 @@ An example for using ``raises()`` in two different ways:
 
    with test.raises(AttributeError, "'list' object has no attribute 'a'"):
        [].a
+
+   with test.raises(ImportError) as e:
+       import worldpeace
+   test.eq('worldpeace', e.exception.name)
+   test.eq(None, e.exception.path)
 
 
 Fixtures can be async (``async def``) but async fixtures can only be used in async tests. Async fixtures are executed in the event loop of the async test they are declared for.
