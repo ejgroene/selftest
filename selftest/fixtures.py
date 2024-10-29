@@ -222,9 +222,10 @@ def raises(tester):
         try:
             yield defer
         except exception as e:
-            if message and message != str(e):
+            msg = e.msg if hasattr(e, 'msg') else str(e)
+            if message and message != msg:
                 raise AssertionError(
-                    f"should raise {exception.__name__} with message '{message}'"
+                    f"Message was {msg!r} but should be {message!r}"
                 ) from e
             defer.set_exception(e)
         except BaseException as e:
@@ -261,9 +262,9 @@ def argv():
     sys.argv = orgv
 
 
-def stdin():
+def stdin(*a):
     try:
-        sys.stdin = io.StringIO()
+        sys.stdin = io.StringIO(*a)
         yield sys.stdin
     finally:
         sys.stdin = sys.__stdin__
@@ -660,7 +661,7 @@ def fixtures_test(self_test):
             with self_test.raises(RuntimeError, "hey woman!"):
                 raise RuntimeError("hey man!")
         except AssertionError as e:
-            assert "should raise RuntimeError with message 'hey woman!'" == str(e)
+            assert "Message was 'hey man!' but should be 'hey woman!'" == str(e)
 
     @self_test
     def assert_raises_special_asserts():
