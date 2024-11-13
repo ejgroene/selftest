@@ -46,6 +46,7 @@ import os  # controlling env
 import sys  # maxsize
 import io  # formatting tests
 
+from .utils import filter_traceback
 
 logger = logging.getLogger("selftest")
 # in order to have tests shown when logging is unconfigured, we log at a level slightly
@@ -178,7 +179,11 @@ class Tester:
                     self._logtest(
                         orig_test_func, orig_test_func.__qualname__
                     )  # TODO pass test func?
-                    test_func(*app_args, **app_kwds)
+                    try:
+                        test_func(*app_args, **app_kwds)
+                    except Exception as e:
+                        e.__traceback__ = filter_traceback(e.__traceback__)
+                        raise e from None
         return orig_test_func if self.option_get("keep") else None
 
     def log_stats(self):
