@@ -30,6 +30,7 @@ import asyncio  # support for async test and fixtures
 import sys  # fiddling with stdout/err
 import os  # fiddling with stdout/err file descriptors
 import io  # StringIO for testing
+import traceback # formating traceback for raises()
 
 
 from .utils import asyncio_filtering_exception_handler, ensure_async_generator_func
@@ -230,7 +231,7 @@ def raises(tester):
             defer.set_exception(e)
         except BaseException as e:
             raise AssertionError(
-                f"should raise {exception.__name__} but raised {type(e).__name__}"
+                f"should raise {exception.__name__} but raised:\n{''.join(traceback.format_exception(e))}"
             ).with_traceback(e.__traceback__) from e
         else:
             e = AssertionError(f"should raise {exception.__name__}")
@@ -646,7 +647,9 @@ def fixtures_test(self_test):
             with self_test.raises(KeyError):
                 raise RuntimeError("oops")
         except AssertionError as e:
-            assert "should raise KeyError but raised RuntimeError" == str(e), str(e)
+            m = str(e)
+            assert m.startswith("should raise KeyError but raised:\nTraceback "), m
+            assert m.endswith('raise RuntimeError("oops")\nRuntimeError: oops\n'), repr(m)
         try:
             with self_test.raises(KeyError):
                 pass
