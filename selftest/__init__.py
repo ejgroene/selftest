@@ -91,7 +91,7 @@ diff_test(self_test)
 
 @self_test
 def check_stats():
-    self_test.eq({"found": 158, "run": 132}, self_test.stats)
+    self_test.eq({"found": 159, "run": 133}, self_test.stats)
 
 
 def assemble_root_runner(**options):

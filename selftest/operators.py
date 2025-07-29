@@ -24,6 +24,7 @@
 import operator  # operators for asserting
 import builtins  # operators for asserting
 import inspect  # operators for asserting
+import math  # operators for asserting
 
 
 class _Operators:
@@ -48,6 +49,8 @@ class _Operators:
                 op = getattr(builtins, name)
             elif hasattr(inspect, name):
                 op = getattr(inspect, name)
+            elif hasattr(math, name):
+                op = getattr(math, name)
             else:
                 op = getattr(args[0], name)
                 args = oargs[1:]
@@ -107,3 +110,15 @@ def operators_test(self_test):
             pass
 
         self_test.isfunction(f)
+
+    @self_test
+    def use_math_module():
+        self_test.isnan(float('nan'))
+        self_test.comp.isnan(1.0)
+        self_test.isfinite(3.0)
+        self_test.comp.isfinite(float('inf'))
+        self_test.isinf(float('inf'))
+        self_test.comp.isinf(3.3)
+        self_test.isclose(     1.000000000, 0.999999999)
+        self_test.comp.isclose(1.00000000,  0.99999999 )
+
