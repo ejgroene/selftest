@@ -305,6 +305,7 @@ testers.clear()
 def setup_correct():
     import tempfile
     import pathlib
+    import setuptools
 
     with tempfile.TemporaryDirectory() as p:
         tmp = pathlib.Path(p)

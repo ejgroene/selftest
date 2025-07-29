@@ -215,6 +215,8 @@ def stderr():
 class Defer:
     def set_exception(self, e):
         self.exception = e
+    def __getattr__(self, name):
+        return getattr(self.exception, name)
 
 
 def raises(tester):
