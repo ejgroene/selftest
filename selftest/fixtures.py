@@ -273,7 +273,30 @@ def stdin(*a):
         sys.stdin = sys.__stdin__
 
 
-std_fixtures = {fx.__name__: fx for fx in [tmp_path, stdout, stderr, stdin, raises, guard, argv]}
+def environ(kw_dict=(), **kw_args):
+    env = os.environ
+    prev_env = dict(env)
+    env.update(kw_args)
+    env.update(kw_dict)
+    try:
+        yield env
+    finally:
+        # avoid re-adding all the keys (has side-effects)
+        for key in env.keys() - prev_env.keys():
+            del env[key]
+        env.update(prev_env)
+
+
+std_fixtures = {fx.__name__: fx for fx in [
+    tmp_path,
+    stdout,
+    stderr,
+    stdin,
+    raises,
+    guard,
+    argv,
+    environ,
+]}
 
 
 def capture_stdout_child_processes_spawn_f():
@@ -726,4 +749,38 @@ def fixtures_test(self_test):
             self_test.eq(f"sys.modules contaminated: {{'this_is_a_module'}}", e.args[0])
         p = sys.modules.pop("this_is_a_module")
         assert p == "not a module"
+
+    @self_test
+    def env_fixture():
+        os_environ_type = type(os.environ)
+        self_test.isinstance(os.environ, os_environ_type)
+
+        with self_test.environ as env:
+            env['XYZ-6532'] = 'remove me'
+            self_test.eq('remove me', os.environ['XYZ-6532'])
+        self_test.eq('--not--', os.environ.get('XYZ-6532', '--not--'))
+
+        os.environ['ALREADYHERE'] = 'already here'
+        with self_test.environ as env:
+            env['ALREADYHERE'] = 'something new'
+            self_test.eq('something new', os.environ['ALREADYHERE'])
+        self_test.eq('already here', os.environ['ALREADYHERE'])
+
+        try:
+            with self_test.environ(NEW_KYE_HER='4422') as env:
+                self_test.eq('4422', env['NEW_KYE_HER'])
+                raise Exception('deliberate')
+        except Exception as e:
+            assert str(e) == 'deliberate'
+            self_test.eq('--not--', os.environ.get('NEW_KYE_HER', '--not--'))
+        else:
+            self.fail('must not come here')
+
+        self_test.isinstance(os.environ, os_environ_type)
+
+    @self_test
+    def with_environ_fixture(environ:{'HERE_IS_I':'the snaky Python'}):
+        self_test.eq('the snaky Python', os.environ['HERE_IS_I'])
+
+    assert 'HERE_IS_I' not in os.environ
 

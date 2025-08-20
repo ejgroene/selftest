@@ -439,8 +439,9 @@ There are standard fixtures for:
 #) stdin - replaces ``sys.stdin`` temporarily with a ``StringIO``. Make sure to ``seek(0)`` after writing.
 #) argv - saves ``sys.argv`` and restores it afterwards.
 #) tmp_path:subpath - creates a temporary ``pathlib.Path`` object, optionally with a subpath,
-#) raises:(Exception, message) - raises AssertionError if given code does not raise given exception with given message; sends an object ``as`` target from which the exception can be retieved for further testing. See example.
-#) guard - isolates tests by saving and restoring sys.path, sys.meta_path, and sys.modules.
+#) raises:(Exception, message) - raises ``AssertionError`` if given code does not raise given exception with given message; sends an object ``as`` target from which the exception can be retieved for further testing. See example.
+#) guard - isolates tests by saving and restoring ``sys.path``, ``sys.meta_path``, and ``sys.modules``.
+#) environ - restores changes to the ``os.environ``. It accepts a ``dict`` when part of the function declaration, as in ``def func(environ: {'a':'b'}):``. Used with ``with``, it also accepts keyword arguments. See how ``raises`` is being used below.
 
 An example for using ``raises()`` in different ways:
 
@@ -456,7 +457,9 @@ An example for using ``raises()`` in different ways:
    with test.raises(ImportError) as e:
        import worldpeace
    test.eq('worldpeace', e.exception.name)
-   test.eq(None, e.exception.path)
+   test.eq(None, e.path)  # most attributes can be deferenced directly
+
+The use of the ``:``, which is normally used for type hints, instead of ``=``, is deliberate. It helps to distinguish it from initialization of default arguments and it keeps the latter intact.
 
 
 Fixtures can be async (``async def``) but async fixtures can only be used in async tests. Async fixtures are executed in the event loop of the async test they are declared for.

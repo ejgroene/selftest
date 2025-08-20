@@ -183,7 +183,7 @@ class Tester:
                         test_func(*app_args, **app_kwds)
                     except Exception as e:
                         e.__traceback__ = filter_traceback(e.__traceback__)
-                        raise e from None
+                        raise e
         return orig_test_func if self.option_get("keep") else None
 
     def log_stats(self):
