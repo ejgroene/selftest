@@ -40,7 +40,9 @@ Usage:
 
 """
 
-if "SELFTEST_MAIN" not in os.environ:
+def main():
+    if "SELFTEST_MAIN" in os.environ:
+        return
     # avoid running main twice (during import in a spawned process)
     os.environ["SELFTEST_MAIN"] = "Y"
 
@@ -107,3 +109,6 @@ if "SELFTEST_MAIN" not in os.environ:
         root.log_stats()
     else:
         p.print_usage()
+
+if __name__ == '__main__':
+    main()
