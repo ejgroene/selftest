@@ -227,14 +227,10 @@ def raises(tester):
         except exception as e:
             msg = e.msg if hasattr(e, 'msg') else str(e)
             if message and message != msg:
-                raise AssertionError(
-                    f"Message was {msg!r} but should be {message!r}"
-                ) from e
+                raise AssertionError(f"Message was {msg!r} but should be {message!r}")
             defer.set_exception(e)
         except BaseException as e:
-            raise AssertionError(
-                f"should raise {exception.__name__} but raised:\n{''.join(traceback.format_exception(e))}"
-            ).with_traceback(e.__traceback__) from e
+            raise AssertionError(f"should raise {exception.__name__} but raised: {e}")
         else:
             e = AssertionError(f"should raise {exception.__name__}")
             e.__suppress_context__ = True
