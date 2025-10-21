@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools >= 77.0.3", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "selftest"
+dynamic = ["version"]
+authors = [ 
+    { name="Erik Groeneveld", email="ejgroene@ieee.org" },
+]
+description = "A tool for running in-source unittests for Python"
+readme = "README.rst"
+requires-python = ">= 3.9"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+keywords = ["in-source", "unittest", "testing"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Testing :: Unit",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+
+[project.scripts]
+"selftest"    = "selftest.__main__:main"
+
+
+[project.urls]
+Homepage = "https://github.com/ejgroene/selftest"
+
+
+[tool.setuptools_scm]
+# empty is enough to avtivate its magic of including a version from the latest tag
+# additionally it adds all files under version control to the package
